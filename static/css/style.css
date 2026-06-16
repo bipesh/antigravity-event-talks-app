@@ -420,6 +420,25 @@ body {
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
+.controls-group {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.filter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.filter-wrapper label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
 .sort-wrapper {
     display: flex;
     align-items: center;
@@ -436,7 +455,8 @@ body {
     position: relative;
 }
 
-#sort-select {
+#sort-select,
+#date-select {
     appearance: none;
     background-color: var(--bg-secondary);
     border: 1.5px solid var(--border-color);
@@ -451,7 +471,8 @@ body {
     transition: var(--transition-fast);
 }
 
-#sort-select:focus {
+#sort-select:focus,
+#date-select:focus {
     border-color: var(--accent-blue);
 }
 
@@ -1117,4 +1138,18 @@ body.light-mode .btn-secondary {
 body.light-mode .btn-secondary:hover {
     background-color: var(--bg-tertiary);
     border-color: var(--text-muted);
+}
+
+/* Search Highlights */
+.search-highlight {
+    background-color: rgba(245, 158, 11, 0.3); /* Transparent amber */
+    color: #f59e0b; /* Amber */
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: 600;
+}
+
+body.light-mode .search-highlight {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #d97706; /* Darker amber for readability in light mode */
 }

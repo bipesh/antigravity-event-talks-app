@@ -4,6 +4,7 @@ let filteredReleases = [];
 let currentFilter = 'all';
 let searchQuery = '';
 let currentSort = 'newest';
+let currentDateFilter = 'all';
 let selectedRelease = null;
 let lastSyncedTime = null;
 let syncTimer = null;
@@ -18,6 +19,7 @@ const searchInput = document.getElementById('search-input');
 const clearSearchBtn = document.getElementById('clear-search-btn');
 const categoryPills = document.getElementById('category-pills');
 const sortSelect = document.getElementById('sort-select');
+const dateSelect = document.getElementById('date-select');
 const loadingSkeleton = document.getElementById('loading-skeleton');
 const releasesGrid = document.getElementById('releases-grid');
 const emptyState = document.getElementById('empty-state');
@@ -98,6 +100,14 @@ function setupEventListeners() {
         filterAndRender();
     });
 
+    // Date Filter Dropdown
+    if (dateSelect) {
+        dateSelect.addEventListener('change', (e) => {
+            currentDateFilter = e.target.value;
+            filterAndRender();
+        });
+    }
+
     // Reset Filters in Empty State
     resetFiltersBtn.addEventListener('click', () => {
         searchInput.value = '';
@@ -110,6 +120,11 @@ function setupEventListeners() {
         
         sortSelect.value = 'newest';
         currentSort = 'newest';
+        
+        if (dateSelect) {
+            dateSelect.value = 'all';
+            currentDateFilter = 'all';
+        }
         
         filterAndRender();
     });
@@ -233,7 +248,26 @@ function filterAndRender() {
             release.type.toLowerCase().includes(searchQuery) ||
             release.body_text.toLowerCase().includes(searchQuery);
             
-        return typeMatch && searchMatch;
+        // Date Range Filter
+        let dateMatch = true;
+        if (currentDateFilter !== 'all' && release.updated_raw) {
+            const releaseDate = new Date(release.updated_raw);
+            const now = new Date();
+            const diffTime = Math.abs(now - releaseDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (currentDateFilter === '30days') {
+                dateMatch = diffDays <= 30;
+            } else if (currentDateFilter === '90days') {
+                dateMatch = diffDays <= 90;
+            } else if (currentDateFilter === '180days') {
+                dateMatch = diffDays <= 180;
+            } else if (currentDateFilter === 'year') {
+                dateMatch = releaseDate.getFullYear() === now.getFullYear();
+            }
+        }
+            
+        return typeMatch && searchMatch && dateMatch;
     });
     
     // 2. Sort by date
@@ -332,6 +366,11 @@ function renderGrid() {
                 showToast("Failed to copy text", "error");
             }
         });
+        
+        // Highlight search queries in card body
+        if (searchQuery) {
+            highlightText(card.querySelector('.card-body'), searchQuery);
+        }
         
         releasesGrid.appendChild(card);
     });
@@ -566,4 +605,56 @@ function updateSyncStatusText() {
     } else {
         statusText.textContent = `Synced ${minutes} mins ago`;
     }
+}
+
+// Walk text nodes recursively and highlight matching query text
+function highlightText(element, query) {
+    if (!query) return;
+    
+    // We walk the text nodes of the element recursively
+    const walk = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+    const textNodes = [];
+    let node;
+    while (node = walk.nextNode()) {
+        textNodes.push(node);
+    }
+    
+    // For each text node, if it matches the query, replace it with highlighted segments
+    textNodes.forEach(node => {
+        const text = node.nodeValue;
+        const lowerText = text.toLowerCase();
+        const index = lowerText.indexOf(query);
+        
+        if (index >= 0) {
+            const span = document.createElement('span');
+            let remainingText = text;
+            let remainingLower = lowerText;
+            
+            while (true) {
+                const matchIndex = remainingLower.indexOf(query);
+                if (matchIndex === -1) {
+                    span.appendChild(document.createTextNode(remainingText));
+                    break;
+                }
+                
+                // Add prefix
+                if (matchIndex > 0) {
+                    span.appendChild(document.createTextNode(remainingText.substring(0, matchIndex)));
+                }
+                
+                // Add highlighted match wrapped in a <mark> tag
+                const matchVal = remainingText.substring(matchIndex, matchIndex + query.length);
+                const mark = document.createElement('mark');
+                mark.className = 'search-highlight';
+                mark.textContent = matchVal;
+                span.appendChild(mark);
+                
+                // Advance pointers
+                remainingText = remainingText.substring(matchIndex + query.length);
+                remainingLower = remainingLower.substring(matchIndex + query.length);
+            }
+            
+            node.parentNode.replaceChild(span, node);
+        }
+    });
 }
