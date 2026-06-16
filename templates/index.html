@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes Explorer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar or Header Background Decorative Gradients -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-container">
+                    <!-- Custom SVG representing BigQuery/Google Cloud databases -->
+                    <svg viewBox="0 0 24 24" class="logo-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#grad-blue)" />
+                        <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="url(#grad-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <defs>
+                            <linearGradient id="grad-blue" x1="2" y1="2" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#4285F4" />
+                                <stop offset="100%" stop-color="#1A73E8" />
+                            </linearGradient>
+                            <linearGradient id="grad-purple" x1="2" y1="12" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#A142F4" />
+                                <stop offset="100%" stop-color="#7B1FA2" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="brand">
+                    <h1>BigQuery Release Explorer</h1>
+                    <p class="brand-subtitle">Track, filter, and share Google Cloud BigQuery updates</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span id="status-text">Checking feed...</span>
+                </div>
+                <button id="refresh-btn" class="btn btn-primary btn-icon" title="Refresh Release Notes">
+                    <svg viewBox="0 0 24 24" class="icon icon-spinner" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Controls Section -->
+        <section class="controls-panel">
+            <!-- Search Bar -->
+            <div class="search-wrapper">
+                <svg viewBox="0 0 24 24" class="search-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" id="search-input" placeholder="Search keywords (e.g. Gemini, SQL, JSON, cost)..." autocomplete="off">
+                <button id="clear-search-btn" class="clear-btn" aria-label="Clear search" style="display: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <!-- Categories and Sorting -->
+            <div class="filter-row">
+                <div class="category-pills" id="category-pills">
+                    <button class="pill active" data-type="all">All Updates</button>
+                    <button class="pill" data-type="Feature">Features</button>
+                    <button class="pill" data-type="Change">Changes</button>
+                    <button class="pill" data-type="Issue">Issues</button>
+                    <button class="pill" data-type="Deprecated">Deprecated</button>
+                </div>
+                <div class="sort-wrapper">
+                    <label for="sort-select">Sort:</label>
+                    <div class="select-container">
+                        <select id="sort-select">
+                            <option value="newest" selected>Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Timeline / Grid Area -->
+        <main class="timeline-container">
+            <!-- Loading Skeleton -->
+            <div id="loading-skeleton" class="skeleton-grid">
+                <div class="skeleton-card">
+                    <div class="skeleton-line skeleton-header"></div>
+                    <div class="skeleton-line skeleton-subheader"></div>
+                    <div class="skeleton-line skeleton-text-1"></div>
+                    <div class="skeleton-line skeleton-text-2"></div>
+                    <div class="skeleton-line skeleton-button"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-line skeleton-header"></div>
+                    <div class="skeleton-line skeleton-subheader"></div>
+                    <div class="skeleton-line skeleton-text-1"></div>
+                    <div class="skeleton-line skeleton-text-2"></div>
+                    <div class="skeleton-line skeleton-button"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-line skeleton-header"></div>
+                    <div class="skeleton-line skeleton-subheader"></div>
+                    <div class="skeleton-line skeleton-text-1"></div>
+                    <div class="skeleton-line skeleton-text-2"></div>
+                    <div class="skeleton-line skeleton-button"></div>
+                </div>
+            </div>
+
+            <!-- Release Notes Grid -->
+            <div id="releases-grid" class="releases-grid" style="display: none;">
+                <!-- Cards will be dynamically inserted here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-icon-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                </div>
+                <h3>No updates found</h3>
+                <p>Try refining your search query or choosing a different category.</p>
+                <button id="reset-filters-btn" class="btn btn-secondary">Clear Filters & Search</button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>BigQuery Release Notes RSS Feed source: <a href="https://docs.cloud.google.com/feeds/bigquery-release-notes.xml" target="_blank" rel="noopener">docs.cloud.google.com</a></p>
+            <p>© 2026 BigQuery Release Notes Dashboard</p>
+        </footer>
+    </div>
+
+    <!-- Tweet Modal Composer (Glassmorphism Overlay) -->
+    <div id="tweet-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg class="x-logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <h2>Compose Tweet</h2>
+                </div>
+                <button id="close-modal-btn" class="close-btn" aria-label="Close modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="selected-note-preview">
+                    <span id="preview-badge" class="badge">Feature</span>
+                    <span id="preview-date" class="date">June 15, 2026</span>
+                </div>
+                
+                <label for="tweet-textarea" class="textarea-label">Customize your tweet text:</label>
+                <div class="textarea-wrapper">
+                    <textarea id="tweet-textarea" rows="6" maxlength="500" placeholder="What would you like to tweet?"></textarea>
+                </div>
+                
+                <div class="tweet-metrics">
+                    <div class="character-progress-container">
+                        <div class="progress-bar-bg">
+                            <div id="character-progress-bar" class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <span id="char-counter" class="char-counter">0 / 280</span>
+                    </div>
+                    <span id="warning-msg" class="warning-text" style="display: none;">Over the standard 280-character limit</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="copy-tweet-btn" class="btn btn-secondary btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy Text</span>
+                </button>
+                <button id="send-tweet-btn" class="btn btn-x-brand btn-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <span>Tweet on X</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Main JavaScript File -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
