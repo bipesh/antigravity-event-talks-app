@@ -605,7 +605,13 @@ body {
     height: 14px;
 }
 
-.btn-tweet-action {
+.card-actions-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-tweet-action,
+.btn-copy-action {
     background-color: transparent;
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
@@ -621,14 +627,16 @@ body {
     transition: var(--transition-fast);
 }
 
-.btn-tweet-action:hover {
+.btn-tweet-action:hover,
+.btn-copy-action:hover {
     background-color: var(--text-primary);
     color: #000000;
     border-color: var(--text-primary);
     transform: translateY(-1px);
 }
 
-.btn-tweet-action svg {
+.btn-tweet-action svg,
+.btn-copy-action svg {
     width: 14px;
     height: 14px;
 }
