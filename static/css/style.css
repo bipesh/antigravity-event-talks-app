@@ -262,6 +262,21 @@ body {
     border-color: var(--text-muted);
 }
 
+.btn-icon-only {
+    padding: 0.75rem;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-only svg {
+    width: 18px;
+    height: 18px;
+}
+
 .btn-x-brand {
     background-color: var(--accent-x);
     color: #000000;
@@ -328,7 +343,7 @@ body {
     border: 1.5px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 0.9rem 1.25rem 0.9rem 3rem;
-    color: white;
+    color: var(--text-primary);
     font-family: var(--font-primary);
     font-size: 0.95rem;
     outline: none;
@@ -786,7 +801,7 @@ body {
 }
 
 .modal-card {
-    background: #0f1524;
+    background: var(--bg-secondary);
     border: 1.5px solid var(--border-color);
     border-radius: var(--radius-lg);
     width: 90%;
@@ -976,9 +991,9 @@ body {
 }
 
 .toast {
-    background: #1e293b;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     padding: 1rem 1.5rem;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
@@ -1051,4 +1066,55 @@ body {
         text-align: center;
         gap: 0.5rem;
     }
+}
+
+/* Light Mode Variables Override */
+body.light-mode {
+    --bg-primary: #f1f5f9;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e2e8f0;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    
+    --accent-blue: #2563eb;
+    --accent-blue-hover: #1d4ed8;
+    --accent-purple: #7c3aed;
+    --accent-purple-hover: #6d28d9;
+    --accent-x: #0f172a;
+    --accent-x-hover: #1e293b;
+    
+    --border-color: #cbd5e1;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
+}
+
+/* Adjustments for light mode */
+body.light-mode .blob {
+    opacity: 0.08;
+}
+
+body.light-mode .pulse-dot {
+    background-color: var(--accent-blue);
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+}
+
+body.light-mode .skeleton-line {
+    background: linear-gradient(90deg, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%);
+}
+
+body.light-mode .btn-secondary {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+body.light-mode .btn-secondary:hover {
+    background-color: var(--bg-tertiary);
+    border-color: var(--text-muted);
 }
