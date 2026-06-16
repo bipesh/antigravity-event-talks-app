@@ -138,6 +138,7 @@ def api_releases():
         "source": source,
         "count": len(releases),
         "timestamp": time.time(),
+        "last_synced": cache["last_fetched"],
         "releases": releases
     })
 

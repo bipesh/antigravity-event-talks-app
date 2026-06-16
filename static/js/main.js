@@ -5,6 +5,8 @@ let currentFilter = 'all';
 let searchQuery = '';
 let currentSort = 'newest';
 let selectedRelease = null;
+let lastSyncedTime = null;
+let syncTimer = null;
 
 // DOM Elements
 const refreshBtn = document.getElementById('refresh-btn');
@@ -167,14 +169,16 @@ async function fetchReleases(forceRefresh = false) {
         if (data.status === 'success') {
             releases = data.releases;
             
-            // Update status text
-            if (data.source === 'cached') {
-                statusText.textContent = "Updates loaded (cached)";
-            } else if (data.source === 'fresh') {
-                statusText.textContent = "Updates synchronized successfully";
+            // Update last synced time state
+            lastSyncedTime = data.last_synced ? data.last_synced * 1000 : Date.now();
+            updateSyncStatusText();
+            
+            // Set up a real-time interval to update the relative time
+            if (syncTimer) clearInterval(syncTimer);
+            syncTimer = setInterval(updateSyncStatusText, 30000); // Check every 30 seconds
+            
+            if (data.source === 'fresh') {
                 showToast("Fetched latest release notes!");
-            } else {
-                statusText.textContent = "Updates loaded";
             }
             
             filterAndRender();
@@ -183,6 +187,7 @@ async function fetchReleases(forceRefresh = false) {
         }
     } catch (error) {
         console.error("Fetch releases error:", error);
+        if (syncTimer) clearInterval(syncTimer);
         statusText.textContent = "Error updating feed";
         showToast("Failed to fetch latest release notes", "error");
         
@@ -538,5 +543,27 @@ function toggleTheme() {
         if (sunIcon) sunIcon.style.display = 'block';
         if (moonIcon) moonIcon.style.display = 'none';
         showToast("Switched to Dark Mode");
+    }
+}
+
+// Calculate and update the relative time in the header status
+function updateSyncStatusText() {
+    if (!lastSyncedTime) {
+        statusText.textContent = "Checking feed...";
+        return;
+    }
+    
+    const diff = Date.now() - lastSyncedTime;
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    
+    if (seconds < 5) {
+        statusText.textContent = "Synced just now";
+    } else if (seconds < 60) {
+        statusText.textContent = `Synced ${seconds}s ago`;
+    } else if (minutes === 1) {
+        statusText.textContent = "Synced 1 min ago";
+    } else {
+        statusText.textContent = `Synced ${minutes} mins ago`;
     }
 }
