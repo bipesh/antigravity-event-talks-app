@@ -65,7 +65,7 @@ Make sure you have **Python 3** installed on your system.
    ```
 
 3. **Open the Explorer**:
-   Navigate to [http://127.0.0.1:5001](http://127.0.0.1:5001) in your browser.
+   Navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 
 ---
 
